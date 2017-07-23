@@ -1,0 +1,26 @@
+{
+  "name": "flashcard-generator",
+  "version": "1.0.0",
+  "description": "generate flashcards",
+  "main": "BasicCard.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/menelik7/Flashcard-Generator.git"
+  },
+  "keywords": [
+    "new"
+  ],
+  "author": "Menelik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/menelik7/Flashcard-Generator/issues"
+  },
+  "homepage": "https://github.com/menelik7/Flashcard-Generator#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "inquirer": "^3.2.0"
+  }
+}
