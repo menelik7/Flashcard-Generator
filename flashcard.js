@@ -1,35 +1,38 @@
+//Call the appropriate requirements
 var  inquirer = require("inquirer");
-var fulldeck = require("./fulldeck.json");
-var BasicCard = require("./BasicCard.js")
-var ClozeCard = require("./ClozeCard.js")
+var BasicCards = require("./BasicCards.json");
+var ClozeCards = require("./ClozeCards.json");
+var BasicCard = require("./BasicCard.js");
+var ClozeCard = require("./ClozeCard.js");
 var colors = require('colors');
 var fs = require("fs");
 
+//Declare golbal variables
 var drawnCard;
 var playedCard;
 var count = 0;
 
-//initially give option to the user to Create new flashcards or use exiting ones.
+//Function to prompt the user to choose from the options presented
 function openMenu() {
-  inquirer.prompt([															//use inquirer to ask question
-      {
-          type: "list",														//type list gives user a list of options
-          message: "\nPlease choose what you would like to accomplish?",	//message shown to the user
-          choices: ["Create", "Run"],	//options that show in list
-          name: "menuOptions"												//refrence name of object
-      }
-  ]).then(function (answer) {												//Once inquirer gets answer then...
+    inquirer.prompt([
+        {
+          type: "list",
+          message: "\r\nWhat would you like to do?",
+          choices: ["Create cards", "Run the existing cards", "Exit"],
+          name: "options"
+        }
+    ]).then(function (answer) {
 
-    switch (answer.menuOptions) {
+    switch (answer.options) {
 
-        case 'Create':
+        case 'Create cards':
             console.log("Ok lets make a new flashcard...");
             createCard();
             break;
 
-        case 'Run':
-            console.log("OK lets run through the deck...");
-            askQuestions();
+        case 'Run the existing cards':
+            console.log("OK...");
+            whichTypeOfCard();
             break;
 
         case 'Exit':
@@ -49,7 +52,7 @@ function openMenu() {
 
 openMenu();
 
-//If the choice is to create a card then this function will run
+//Function that creates a card if the criteria is met.
 function createCard() {
     inquirer.prompt([
         {
@@ -61,8 +64,8 @@ function createCard() {
 
     ]).then(function (appData) {
 
-        var cardType = appData.cardType;  			//the variable cardType will store the choice from the cardType inquirer object.
-        console.log(cardType);			  			//prints the card type chosen to the user
+        var cardType = appData.cardType;
+        console.log(cardType);
 
         if (cardType === "Basic Card") {
             inquirer.prompt([
@@ -80,15 +83,15 @@ function createCard() {
 
             ]).then(function (cardData) {
 
-                var cardObj = {						//builds an object with front and back info
+                var cardObj = {
                     type: "BasicCard",
                     front: cardData.front,
                     back: cardData.back
                 };
-                fulldeck.push(cardObj);				//push the new card into the array of cards
-                fs.writeFile("fulldeck.json", JSON.stringify(fulldeck, null, 2)); //write the updated array to the carLibrary.json file
+                BasicCards.push(cardObj);
+                fs.writeFile("BasicCards.json", JSON.stringify(BasicCards, null, 2));
 
-                inquirer.prompt([					//use inquirer to ask if the user wants to keep making cards
+                inquirer.prompt([
                     {
                         type: "list",
                         message: "Do you want to create another card?",
@@ -96,16 +99,16 @@ function createCard() {
                         name: "anotherCard"
                     }
 
-                ]).then(function (appData) {				//once the user gives answer....
-                    if (appData.anotherCard === "Yes") {	//If 'Yes' then..
-                        createCard();						//call the create card function again (recursion)
-                    } else {								//Else (if the answer isnt Yes then its No)...
-                        setTimeout(openMenu, 1000);			//reopen the main menu to the user
+                ]).then(function (appData) {
+                    if (appData.anotherCard === "Yes") {
+                        createCard();						
+                    } else {						
+                        setTimeout(openMenu, 1000);
                     }
                 });
             });
 
-        } else {						//Else (if the anser isn't Basic it had to be Cloze)
+        } else {//Else (if the anser isn't Basic it had to be Cloze)
             inquirer.prompt([
                 {
                     type: "input",
@@ -126,14 +129,14 @@ function createCard() {
                     text: cardData.text,
                     cloze: cardData.cloze
                 };
-                if (cardObj.text.indexOf(cardObj.cloze) !== -1) {   //checking to make sure the Cloze matches some text in the statement
-                    fulldeck.push(cardObj);							//push the new card into the array of cards
-                    fs.writeFile("fulldeck.json", JSON.stringify(fulldeck, null, 2)); //write the updated array to the cardLibrary file
-                } else {											//if the cloze doesnt match then give a message to the user.
+                if (cardObj.text.indexOf(cardObj.cloze) !== -1) {   
+                    ClozeCards.push(cardObj);							
+                    fs.writeFile("ClozeCards.json", JSON.stringify(ClozeCards, null, 2)); 
+                } else {
                     console.log("Sorry, The cloze must match some word(s) in the text of your statement.");
 
                 }
-                inquirer.prompt([					//use inquirer to ask if the user wants to keep making cards
+                inquirer.prompt([					
                     {
                         type: "list",
                         message: "Do you want to create another card?",
@@ -141,11 +144,11 @@ function createCard() {
                         name: "anotherCard"
                     }
 
-                ]).then(function (appData) {				//once the user gives answer....
-                    if (appData.anotherCard === "Yes") {	//If 'Yes' then..
-                        createCard();						//call the create card function again (recursion)
-                    } else {								//Else (if the answer isnt Yes then its No)...
-                        setTimeout(openMenu, 1000);		//return the user to the open menu
+                ]).then(function (appData) {				
+                    if (appData.anotherCard === "Yes") {	
+                        createCard();						
+                    } else {								
+                        setTimeout(openMenu, 1000);
                     }
                 });
             });
@@ -156,46 +159,95 @@ function createCard() {
 
 //function used to get the question from the drawnCard in the askQuestions function
 function getQuestion(card) {
-    if (card.type === "BasicCard") {						//If the cards type is "BasicCard" then....
-        drawnCard = new BasicCard(card.front, card.back);	//drawnCard becomes a new instance of BasicCard constuctor with its front and back passed in
-        return drawnCard.front;								//Return the front of the card (the questions side)
-    } else if (card.type === "ClozeCard") {					//If the card type is "Cloze Card" then...
-        drawnCard = new ClozeCard(card.text, card.cloze)	//drawnCard becomes a new instance of ClozeCard constuctor with its text and cloze passed in
-        return drawnCard.clozeRemoved();					//Return the ClozeCard prototpe method clozeRemoved to show the question missing the cloze
+    if (card.type === "BasicCard") {						
+        drawnCard = new BasicCard(card.front, card.back);	
+        return drawnCard.front;								
+    } else if (card.type === "ClozeCard") {					
+        drawnCard = new ClozeCard(card.text, card.cloze)	
+        return drawnCard.clozeRemoved();
     }
 };
 
-//function to ask questions from all stored card in the library
-function askQuestions() {
-    if (count < fulldeck.length) {					//if current count (starts at 0) is less than the number of cards in the library....
-        playedCard = getQuestion(fulldeck[count]);	//playedCard stores the question from the card with index equal to the current counter.
-        inquirer.prompt([							//inquirer used to ask the question from the playedCard.
+//Allow the user to determine which type of cards to run.
+function whichTypeOfCard(){
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "What type of flashcard do you want to run?",
+            choices: ["Basic Card", "Cloze Card"],
+            name: "cardType"
+        }
+    ]).then(function (appData) {
+        var cardType = appData.cardType;
+        if (cardType === "Basic Card") {
+            console.log("Let's get started with the Basics...")
+            BasicCardsQuestions();
+        } else {
+            console.log("Let's get started with the Cloze...")
+            ClozeCardsQuestions();
+        }
+    });
+}
+// //function to ask questions from all stored card in the library
+function BasicCardsQuestions() {
+    if (count < BasicCards.length) {					
+        playedCard = getQuestion(BasicCards[count]);	
+        inquirer.prompt([						
             {
                 type: "input",
                 message: playedCard,
                 name: "question"
             }
-        ]).then(function (answer) {					//once the user answers
+        ]).then(function (answer) {					
         	//if the users answer equals .back or .cloze of the playedCard run a message "You are correct."
-            if (answer.question === fulldeck[count].back || answer.question === fulldeck[count].cloze) {
+            if (answer.question === BasicCards[count].back || answer.question === BasicCards[count].cloze) {
                 console.log(colors.green("You are correct."));
             } else {
             	//check to see if current card is Cloze or Basic
                 if (drawnCard.front !== undefined) { //if card has a front then it is a Basic card
-                    console.log(colors.red("Sorry, the correct answer was ") + fulldeck[count].back + "."); //grabs & shows correct answer
+                    console.log(colors.red("Sorry, the correct answer was ") + BasicCards[count].back + ".");
                 } else { // otherwise it is a Cloze card
-                    console.log(colors.red("Sorry, the correct answer was ") + fulldeck[count].cloze + ".");//grabs & shows correct answer
+                    console.log(colors.red("Sorry, the correct answer was ") + BasicCards[count].cloze + ".");
                 }
             }
-            count++; 		//increase the counter for the next run through
-            askQuestions(); //recursion. call the function within the function to keep it running. It will stop when counter=library.length
+            count++; 		
+            BasicCardsQuestions(); 
         });
     } else {
+        console.log("\r\nThanks for playing dude/dudette!");
       	count=0;			//reset counter to 0 once loop ends
-      	openMenu();			//call the menu for the user to continue using the app
+      	openMenu();			
     }
 };
 
-// createCard();
-// askQuestions();
-// getQuestion();
+function ClozeCardsQuestions() {
+    if (count < ClozeCards.length) {                  
+        playedCard = getQuestion(ClozeCards[count]);  
+        inquirer.prompt([                       
+            {
+                type: "input",
+                message: playedCard,
+                name: "question"
+            }
+        ]).then(function (answer) {                 
+            //if the users answer equals .back or .cloze of the playedCard run a message "You are correct."
+            if (answer.question === ClozeCards[count].back || answer.question === ClozeCards[count].cloze) {
+                console.log(colors.green("You are correct."));
+            } else {
+                //check to see if current card is Cloze or Basic
+                if (drawnCard.front !== undefined) { //if card has a front then it is a Basic card
+                    console.log(colors.red("Sorry, the correct answer was ") + ClozeCards[count].back + ".");
+                } else { // otherwise it is a Cloze card
+                    console.log(colors.red("Sorry, the correct answer was ") + ClozeCards[count].cloze + ".");
+                }
+            }
+            count++;        
+            ClozeCardsQuestions(); 
+        });
+    } else {
+        console.log("\r\nThanks for playing dude/dudette!");
+        count=0;            //reset counter to 0 once loop ends
+        openMenu();         
+    }
+};
+

@@ -1,0 +1,27 @@
+[
+  {
+    "type": "BasicCard",
+    "front": "A document created after the war that gave the colonists their independence.",
+    "back": "Treaty of Paris"
+  },
+  {
+    "type": "BasicCard",
+    "front": "A person who supported the British during the American Revolution.",
+    "back": "Loyalist"
+  },
+  {
+    "type": "BasicCard",
+    "front": "A tax that the British Pariliament placed on newspapers and official documents sold in the American Colonies.",
+    "back": "Stamp Act"
+  },
+  {
+    "type": "BasicCard",
+    "front": "He was a delegate from Virginia at the Second Continental Congress and wrote the Declaration of Independence. He later served as the third President of the United States.",
+    "back": "Thomas Jefferson"
+  },
+  {
+    "type": "BasicCard",
+    "front": "Who am I?",
+    "back": "Programmer"
+  }
+]
